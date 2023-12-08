@@ -1,12 +1,14 @@
 package org.example.demogeneralispringboottesting.repository;
 
 import org.example.demogeneralispringboottesting.model.Employee;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,17 +30,21 @@ class EmployeeRepositoryTest {
     @Autowired
     private EmployeeRepository employeeRepository;
 
-
-    //    @DisplayName("JUnit test dla zapisywania pracowników")
-    @Test
-    void givenEmployeeObject_whenSave_thenReturnSavedEmployee() {
-        // given
-        Employee employee = Employee.builder()
+    private Employee employee;
+    @BeforeEach
+    void setUp(){
+        employee = Employee.builder()
                 .firstName("Adam")
                 .lastName("Małysz")
                 .email("adam@gmail.com")
                 .build();
 
+    }
+
+    //    @DisplayName("JUnit test dla zapisywania pracowników")
+    @Test
+    void givenEmployeeObject_whenSave_thenReturnSavedEmployee() {
+        // given
         // when
         Employee savedEmployee = employeeRepository.save(employee);
 
@@ -51,11 +57,6 @@ class EmployeeRepositoryTest {
     @Test
     void givenEmployeeList_whenFindAll_thenEmployeeList() {
         // given
-        Employee employee = Employee.builder()
-                .firstName("Adam")
-                .lastName("Małysz")
-                .email("adam@gmail.com")
-                .build();
         Employee employee1 = Employee.builder()
                 .firstName("Robert")
                 .lastName("Kubica")
@@ -77,11 +78,6 @@ class EmployeeRepositoryTest {
     @Test
     void givenEmployeeObject_whenFindById_thenReturnedEmployeeObject() {
         // given
-        Employee employee = Employee.builder()
-                .firstName("Adam")
-                .lastName("Małysz")
-                .email("adam@gmail.com")
-                .build();
         employeeRepository.save(employee);
 
         // when
@@ -94,13 +90,8 @@ class EmployeeRepositoryTest {
 
     @DisplayName("pobieranie po adresie 'Emial'")
     @Test
-    void x() {
+    void givenEmployeeObject_whenFindByEmail_thenReturnEmployeeObject() {
         // given
-        Employee employee = Employee.builder()
-                .firstName("Adam")
-                .lastName("Małysz")
-                .email("adam@gmail.com")
-                .build();
         employeeRepository.save(employee);
 
         // when
@@ -112,27 +103,96 @@ class EmployeeRepositoryTest {
 
     @DisplayName("uaktualnienie danych pracowników")
     @Test
-    public void givenEmployeeObject_whenUpdateEmployee_thenReturnUpdatedEmployee(){
+    public void givenEmployeeObject_whenUpdateEmployee_thenReturnUpdatedEmployee() {
         // given - precondition or setup
-        Employee employee = Employee.builder()
-                .firstName("Adam")
-                .lastName("Małysz")
-                .email("adam@gmail.com")
-                .build();
         employeeRepository.save(employee);
 
         // when
         Employee savedEmployee = employeeRepository.findById(employee.getId()).get();
         savedEmployee.setEmail("jarek@gmail.com");
         savedEmployee.setFirstName("Jarek");
-        Employee updatedEmployee =  employeeRepository.save(savedEmployee);
+        Employee updatedEmployee = employeeRepository.save(savedEmployee);
 
         // then
         assertThat(updatedEmployee.getEmail()).isEqualTo("jarek@gmail.com");
         assertThat(updatedEmployee.getFirstName()).isEqualTo("Jarek");
     }
 
-// - usuwanie pracowników
-// - testy dla zapytań za pomocą JPQL
-// - testy dla zapytań z indeksowanymi parametrami
+    @DisplayName("Usuwanie pracowników")
+    @Test
+    void givenEmployee_whenDelete_thenEmployeeNotPresent() {
+        // given
+        employeeRepository.save(employee);
+
+        // when
+        employeeRepository.deleteById(employee.getId());
+        Optional<Employee> employeeOptional = employeeRepository.findById(employee.getId());
+
+        // then
+        assertThat(employeeOptional).isEmpty();
+    }
+
+    @DisplayName("testy dla zapytań za pomocą JPQL z bindowaniem parametrów")
+    @Test
+    void givenFirstNameAndLastName_whenFindByJPQL_thenReturnedEmployee() {
+        // given
+        employeeRepository.save(employee);
+        String firstName = "Adam";
+        String lastName = "Małysz";
+
+        // when
+        Employee findedEmployee = employeeRepository.findByJPQL(firstName, lastName);
+
+        // then
+        assertThat(findedEmployee).isNotNull();
+        assertThat(findedEmployee).isEqualTo(employee);
+    }
+
+    @DisplayName("testy dla zapytań za pomocą JPQL z nazwami parametrów")
+    @Test
+    void givenFirstNameAndLastName_whenFindByJPQLNamedParams_thenReturnedEmployee() {
+        // given
+        employeeRepository.save(employee);
+        String firstName = "Adam";
+        String lastName = "Małysz";
+
+        // when
+        Employee findedEmployee = employeeRepository.findByJPQLNamedParams(firstName, lastName);
+
+        // then
+        assertThat(findedEmployee).isNotNull();
+        assertThat(findedEmployee).isEqualTo(employee);
+    }
+
+    @DisplayName("testy dla zapytań za pomocą JPQL z bindowaniem parametrów")
+    @Test
+    void givenFirstNameAndLastName_whenFindByNativeSQL_thenReturnedEmployee() {
+        // given
+        employeeRepository.save(employee);
+        String firstName = "Adam";
+        String lastName = "Małysz";
+
+        // when
+        Employee findedEmployee = employeeRepository.findByNativeSQL(firstName, lastName);
+
+        // then
+        assertThat(findedEmployee).isNotNull();
+        assertThat(findedEmployee).isEqualTo(employee);
+    }
+
+    @DisplayName("testy dla zapytań za pomocą JPQL z nazwami parametrów")
+    @Test
+    void givenFirstNameAndLastName_whenFindByJPQLNativeSqlNamedParams_thenReturnedEmployee() {
+        // given
+        employeeRepository.save(employee);
+        String firstName = "Adam";
+        String lastName = "Małysz";
+
+        // when
+        Employee findedEmployee = employeeRepository.findByJPQLNativeSqlNamedParams(firstName, lastName);
+
+        // then
+        assertThat(findedEmployee).isNotNull();
+        assertThat(findedEmployee).isEqualTo(employee);
+    }
 }
