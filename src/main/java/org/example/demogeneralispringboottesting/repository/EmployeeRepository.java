@@ -12,7 +12,6 @@ import java.util.Optional;
 //@Repository // nie musimy dawać Bean, ponieważ implementacja 'JpaRepository' w postaci 'SimpleJpaRepository' jest oznaczona jako @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Optional<Employee> findByEmail(String email);
-
     // Własne zapytanie używające JPQL ze zbindowanymi zmiennymi
     @Query("select e from Employee e where e.firstName = ?1 and e.lastName = ?2")
     Employee findByJPQL(String firstName, String lastName);
