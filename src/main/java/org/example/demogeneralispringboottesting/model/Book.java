@@ -7,6 +7,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @AllArgsConstructor
@@ -44,5 +45,16 @@ public class Book {
     @Column(name = "rating")
     private List<Integer> ratings;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Book book = (Book) o;
+        return publishedYear == book.publishedYear && Objects.equals(title, book.title) && Objects.equals(author, book.author) && Objects.equals(isbn, book.isbn) && Objects.equals(genre, book.genre) && Objects.equals(price, book.price) && Objects.equals(available, book.available) && Objects.equals(ratings, book.ratings);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, author, isbn, publishedYear, genre, price, available, ratings);
+    }
 }
