@@ -526,7 +526,8 @@ class BookRepositoryTest {
         Double avgRating = bookRepository.calculateAverageRatingByAuthor(book.getAuthor());
         // then
         assertThat(avgRating).isNotNull();
-        assertThat(avgRating).isGreaterThanOrEqualTo(countAvgRating(bookList));
+        assertThat(avgRating).isGreaterThanOrEqualTo(countAvgRating(bookList)); // metoda z klasy testowej
+        assertThat(avgRating).isGreaterThanOrEqualTo(bookList.stream().mapToDouble(Book::countAvgRating).average().orElse(0.0)); // metoda z klasy book
     }
 
     private static Double countAvgRating(List<Book> bookList) {

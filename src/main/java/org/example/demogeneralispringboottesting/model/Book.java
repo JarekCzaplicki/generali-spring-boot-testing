@@ -45,6 +45,9 @@ public class Book {
     @Column(name = "rating")
     private List<Integer> ratings;
 
+    public Double countAvgRating() {
+        return this.getRatings().stream().mapToInt(Integer::intValue).average().orElse(0.0);
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
