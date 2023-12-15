@@ -179,7 +179,7 @@ class BookRepositoryTest {
 
     @DisplayName("Test wyszukiwania książki po ISBN")
     @Test
-    void testFindBookByISBN(){
+    void testFindBookByISBN() {
         // given
         bookRepository.save(book);
         String isbn = "1234567890123";
@@ -194,7 +194,7 @@ class BookRepositoryTest {
 
     @DisplayName("Test wyszukiwania książek tańszych od podanej ceny v1")
     @Test
-    void testFindBooksCheaperThan(){
+    void testFindBooksCheaperThan() {
         // given
         bookRepository.save(book);
         BigDecimal price = new BigDecimal("50.00");
@@ -209,7 +209,7 @@ class BookRepositoryTest {
 
     @Test
     @DisplayName("Test wyszukiwania książek tańszych od podanej ceny v2")
-    void testFindByPriceLessThan(){
+    void testFindByPriceLessThan() {
         // given
         bookRepository.save(book);
         BigDecimal price = new BigDecimal("50.00");
@@ -224,7 +224,7 @@ class BookRepositoryTest {
 
     @Test
     @DisplayName("Test wyszukiwania książek tańszych od podanej ceny v3")
-    void testFindAllByPriceBefore(){
+    void testFindAllByPriceBefore() {
         // given
         bookRepository.save(book);
         BigDecimal price = new BigDecimal("50.00");
@@ -238,10 +238,9 @@ class BookRepositoryTest {
     }
 
 
-
     @DisplayName("Test wyszukiwania dostępnych książek v2")
     @Test
-    void testFindBooksByAvailableTrue(){
+    void testFindBooksByAvailableTrue() {
         // given
         Book newBook = new Book(
                 2L,
@@ -266,7 +265,7 @@ class BookRepositoryTest {
 
     @DisplayName("Test wyszukiwania dostępnych książek")
     @Test
-    void testFindAllAvailableBooks(){
+    void testFindAllAvailableBooks() {
         // given
         Book newBook = new Book(
                 2L,
@@ -288,9 +287,10 @@ class BookRepositoryTest {
         assertThat(books).isNotEmpty();
         assertThat(books).allMatch(Book::getAvailable);
     }
+
     @DisplayName("Test wyszukiwania książek po autorze")
     @Test
-    void testFindByAuthorSQL(){
+    void testFindByAuthorSQL() {
         // given
         Book newBook = new Book(
                 2L,
@@ -314,9 +314,10 @@ class BookRepositoryTest {
         assertThat(books).isNotEmpty();
         assertThat(books).allMatch(b -> b.getAuthor().equals(author)); // Predykat zwraca zawsze 'True' dla pustego zbioru 'prawo pustego zbioru'
     }
+
     @DisplayName("Test wyszukiwania niedawno wydanych książek w danym gatunku")
     @Test
-    void testFindRecentBooksByGenre(){
+    void testFindRecentBooksByGenre() {
 // given
         Book newBook = new Book(
                 2L,
@@ -344,7 +345,7 @@ class BookRepositoryTest {
 
     @DisplayName("Test wyszukiwania niedawno wydanych książek w danym gatunku")
     @Test
-    void testFindAllByPublishedYearAfterAndGenre(){
+    void testFindAllByPublishedYearAfterAndGenre() {
         // given
         Book newBook = new Book(
                 2L,
@@ -372,7 +373,7 @@ class BookRepositoryTest {
 
     @DisplayName("Test zliczania wszystkich książek")
     @Test
-    void testCountAllBooks(){
+    void testCountAllBooks() {
         // given
         bookRepository.save(book);
 
@@ -385,7 +386,7 @@ class BookRepositoryTest {
 
     @DisplayName("Test zliczania wszystkich książek w danym gatunku")
     @Test
-    void testCountingBooksByGenre(){
+    void testCountingBooksByGenre() {
         // given
         Book saved = bookRepository.save(book);
 
@@ -394,10 +395,149 @@ class BookRepositoryTest {
 
         assertThat(count).isEqualTo(1);
     }
-    //- Test wyszukiwania najdroższej książki
-    //- Test wyszukiwania książek z ocenami powyżej określonego progu
+
+    @DisplayName("Test wyszukiwania najdroższej książki")
+    @Test
+    void testFindMostExpensiveBooks() {
+        // given
+        bookRepository.save(book);
+
+        // when
+        List<Book> books = bookRepository.findMostExpensiveBooks();
+
+        // then
+        assertThat(books).isNotEmpty();
+        assertThat(books).hasSize(1);
+    }
+
+    @DisplayName("Test wyszukiwania najdroższej książki z 5-ciu")
+    @Test
+    void testFindMostExpensiveBooksFromFive() {
+        Book newBook1 = new Book(2L, "Harry Potter1", "J.K. Rowling", "2234567890010", 2001, "Fantasy",
+                new BigDecimal("99.99"), true, Arrays.asList(5, 4, 5, 4, 5));
+
+        Book newBook2 = new Book(3L, "Harry Potter2", "J.K. Rowling", "3234567890010", 2001, "Fantasy",
+                new BigDecimal("99.99"), true, Arrays.asList(5, 4, 5, 4, 5));
+
+        Book newBook3 = new Book(4L, "Harry Potter3", "J.K. Rowling", "4234567890010", 2001, "Fantasy",
+                new BigDecimal("99.99"), true, Arrays.asList(5, 4, 5, 4, 5));
+
+        Book newBook4 = new Book(5L, "Harry Potter4", "J.K. Rowling", "5234567890010", 2001, "Fantasy",
+                new BigDecimal("29.99"), true, Arrays.asList(5, 4, 5, 4, 5));
+        bookRepository.save(book);
+        bookRepository.save(newBook1);
+        bookRepository.save(newBook2);
+        bookRepository.save(newBook3);
+        bookRepository.save(newBook4);
+
+        // when
+        List<Book> books = bookRepository.findMostExpensiveBooksNative();
+
+        // then
+        assertThat(books).isNotEmpty();
+        assertThat(books).hasSize(3);
+        assertThat(books).allMatch(b -> b.getPrice().equals(new BigDecimal("99.99")));
+    }
+
+    @DisplayName("Test wyszukiwania książek z ocenami powyżej określonego progu")
+    @Test
+    void testFindBooksWithRatingsAboveThreshold() {
+        // given
+        Book newBook1 = new Book(2L, "Harry Potter1", "J.K. Rowling", "2234567890010", 2001, "Fantasy",
+                new BigDecimal("99.99"), true, Arrays.asList(1, 2, 3, 4, 5));
+
+        Book newBook2 = new Book(3L, "Harry Potter2", "J.K. Rowling", "3234567890010", 2001, "Fantasy",
+                new BigDecimal("99.99"), true, Arrays.asList(6, 7, 8, 9, 10));
+
+        Book newBook3 = new Book(4L, "Harry Potter3", "J.K. Rowling", "4234567890010", 2001, "Fantasy",
+                new BigDecimal("99.99"), true, Arrays.asList(0, 1, 1, 1, 0));
+
+        Book newBook4 = new Book(5L, "Harry Potter4", "J.K. Rowling", "5234567890010", 2001, "Fantasy",
+                new BigDecimal("29.99"), true, Arrays.asList(2, 1, 2, 1, 5));
+        bookRepository.save(book);
+        bookRepository.save(newBook1);
+        bookRepository.save(newBook2);
+        bookRepository.save(newBook3);
+        bookRepository.save(newBook4);
+        int ratingThreshold = 4;
+
+        // when
+        List<Book> books = bookRepository.findBooksWithRatingsAbove(ratingThreshold);
+        books.forEach(book -> System.out.printf("Książka z ratingiem %s: oraz id: %d%n", book.getRatings(), book.getId()));
+        // then
+        assertThat(books).isNotEmpty();
+        assertThat(books).allMatch(b -> b.getRatings().stream().anyMatch(rating -> rating > ratingThreshold));
+    }
+
+    @DisplayName("Test wyszukiwania książek z ocenami powyżej określonego progu")
+    @Test
+    void testFindBooksWithMinimumRatingsAboveThreshold() {
+        // given
+        Book newBook1 = new Book(2L, "Harry Potter1", "J.K. Rowling", "2234567890010", 2001, "Fantasy",
+                new BigDecimal("99.99"), true, Arrays.asList(1, 2, 3, 4, 5));
+
+        Book newBook2 = new Book(3L, "Harry Potter2", "J.K. Rowling", "3234567890010", 2001, "Fantasy",
+                new BigDecimal("99.99"), true, Arrays.asList(6, 7, 8, 9, 10));
+
+        Book newBook3 = new Book(4L, "Harry Potter3", "J.K. Rowling", "4234567890010", 2001, "Fantasy",
+                new BigDecimal("99.99"), true, Arrays.asList(4, 4, 12, 4, 5));
+
+        Book newBook4 = new Book(5L, "Harry Potter4", "J.K. Rowling", "5234567890010", 2001, "Fantasy",
+                new BigDecimal("29.99"), true, Arrays.asList(2, 1, 2, 1, 5));
+        bookRepository.save(book);
+        bookRepository.save(newBook1);
+        bookRepository.save(newBook2);
+        bookRepository.save(newBook3);
+        bookRepository.save(newBook4);
+        int ratingThreshold = 4;
+
+        // when
+        List<Book> books = bookRepository.findBooksWithMinimumRatingsAbove(ratingThreshold);
+        books.forEach(book -> System.out.printf("Książka z ratingiem %s: oraz id: %d%n", book.getRatings(), book.getId()));
+        // then
+        assertThat(books).isNotEmpty();
+        assertThat(books).allMatch(b -> b.getRatings().stream().anyMatch(rating -> rating > ratingThreshold));
+    }
+
+    @DisplayName("Test średniej oceny książek danego autora")
+    @Test
+    void testCalculateAverageRatingByAuthor() {
+        // given
+        Book newBook1 = new Book(2L, "Harry Potter1", "J.K. Rowling", "2234567890010", 2001, "Fantasy",
+                new BigDecimal("99.99"), true, Arrays.asList(1, 2, 3, 4, 5));
+
+        Book newBook2 = new Book(3L, "Harry Potter2", "J.K. Rowling", "3234567890010", 2001, "Fantasy",
+                new BigDecimal("99.99"), true, Arrays.asList(6, 7, 8, 9, 10));
+
+        Book newBook3 = new Book(4L, "Harry Potter3", "J.K. Rowling", "4234567890010", 2001, "Fantasy",
+                new BigDecimal("99.99"), true, Arrays.asList(4, 4, 12, 4, 5));
+
+        Book newBook4 = new Book(5L, "Harry Potter4", "J.K. Rowling", "5234567890010", 2001, "Fantasy",
+                new BigDecimal("29.99"), true, Arrays.asList(2, 1, 2, 1, 5));
+        bookRepository.save(book);
+        bookRepository.save(newBook1);
+        bookRepository.save(newBook2);
+        bookRepository.save(newBook3);
+        bookRepository.save(newBook4);
+
+        List<Book> bookList = bookRepository.findByAuthor(book.getAuthor());
+
+        // when
+        Double avgRating = bookRepository.calculateAverageRatingByAuthor(book.getAuthor());
+        // then
+        assertThat(avgRating).isNotNull();
+        assertThat(avgRating).isGreaterThanOrEqualTo(countAvgRating(bookList));
+    }
+
+    private static Double countAvgRating(List<Book> bookList) {
+        double result = 0.0d;
+        for (Book book1 : bookList) {
+            result += book1.getRatings().stream().mapToInt(Integer::intValue).average().orElse(0.0);
+        }
+        return result;
+    }
+    //- Test średniej oceny książek danego autora.
     //- Test aktualizacji dostępności książki
     //- Test dodawania oceny do książki
-    //- Test średniej oceny książek danego autora.
 
 }
