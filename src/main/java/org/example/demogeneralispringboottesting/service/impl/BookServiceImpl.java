@@ -1,6 +1,7 @@
 package org.example.demogeneralispringboottesting.service.impl;
 
 import org.example.demogeneralispringboottesting.model.Book;
+import org.example.demogeneralispringboottesting.repository.BookRepository;
 import org.example.demogeneralispringboottesting.service.BookService;
 import org.springframework.stereotype.Service;
 
@@ -9,9 +10,15 @@ import java.util.List;
 import java.util.Optional;
 @Service
 public class BookServiceImpl implements BookService {
+    private final BookRepository bookRepository;
+
+    public BookServiceImpl(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
+    }
+
     @Override
     public Book saveBook(Book book) {
-        return null;
+        return bookRepository.save(book);
     }
 
     @Override
