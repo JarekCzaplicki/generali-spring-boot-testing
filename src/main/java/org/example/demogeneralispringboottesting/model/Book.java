@@ -60,4 +60,8 @@ public class Book {
     public int hashCode() {
         return Objects.hash(title, author, isbn, publishedYear, genre, price, available, ratings);
     }
+
+//    public boolean isAvailable() {
+//        return available;
+//    }
 }

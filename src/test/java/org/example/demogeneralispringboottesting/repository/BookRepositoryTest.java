@@ -537,8 +537,37 @@ class BookRepositoryTest {
         }
         return result;
     }
-    //- Test średniej oceny książek danego autora.
-    //- Test aktualizacji dostępności książki
-    //- Test dodawania oceny do książki
+
+    @DisplayName("Test aktualizacji dostępności książki")
+    @Test
+    void testUpdatedBookAvailability(){
+        // given
+        Book savedBook = bookRepository.save(book);
+        boolean newAvailabilityStatus = false;
+
+        // when
+        savedBook.setAvailable(newAvailabilityStatus);
+        Book updatedBook = bookRepository.save(savedBook);
+
+        // then
+        assertThat(updatedBook.getAvailable()).isEqualTo(newAvailabilityStatus);
+    }
+
+
+    @DisplayName("Test dodawania oceny do książki")
+    @Test
+    void testAddRatingToBook (){
+        // given
+        Book savedBook = bookRepository.save(book);
+        int newRating = 9;
+
+        // when
+        savedBook.getRatings().add(newRating);
+        Book updatedBook = bookRepository.save(savedBook);
+
+        // then
+        assertThat(updatedBook.getRatings()).contains(newRating);
+        assertThat(updatedBook.getRatings().size()).isEqualTo(6);
+    }
 
 }
