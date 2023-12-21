@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
+
 @Service
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
@@ -23,77 +25,77 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<Book> getAllBooks() {
-        return null;
+        return bookRepository.findAll();
     }
 
     @Override
     public Optional<Book> getBookById(Long id) {
-        return Optional.empty();
+        return bookRepository.findById(id);
     }
 
     @Override
     public Book updateBook(Book book) {
-        return null;
+        return bookRepository.save(book);
     }
 
     @Override
     public void deleteBook(Long id) {
-
+        bookRepository.deleteById(id);
     }
 
     @Override
     public List<Book> findBooksByGenre(String genre) {
-        return null;
+        return bookRepository.findByGenre(genre);
     }
 
     @Override
     public List<Book> findBooksByAuthorAndPublishedYear(String author, int publishedYear) {
-        return null;
+        return bookRepository.findBooksByAuthorAndPublishedYear(author, publishedYear);
     }
 
     @Override
     public int countBooksByPublishedYear(int year) {
-        return 0;
+        return bookRepository.countBooksByPublishedYear(year);
     }
 
     @Override
     public Book findBookByIsbn(String isbn) {
-        return null;
+        return bookRepository.findBookByIsbn(isbn).orElseThrow(NoSuchElementException::new);
     }
 
     @Override
     public List<Book> findBooksCheaperThan(BigDecimal price) {
-        return null;
+        return bookRepository.findBooksCheaperThan(price);
     }
 
     @Override
     public List<Book> findAllAvailableBooks() {
-        return null;
+        return bookRepository.findAllAvailableBooks();
     }
 
     @Override
     public List<Book> findByAuthor(String author) {
-        return null;
+        return bookRepository.findByAuthor(author);
     }
 
     @Override
     public List<Book> findRecentBooksByGenre(int year, String genre) {
-        return null;
+        return bookRepository.findRecentBooksByGenre(year, genre);
     }
 
     @Override
     public long countAllBooks() {
-        return 0;
+        return bookRepository.count();
     }
 
     @Override
     public long countBooksByGenre(String genre) {
-        return 0;
+        return bookRepository.countByGenre(genre);
     }
 
     @Override
     public List<Book> findMostExpensiveBooks() {
-        return null;
+        return bookRepository.findMostExpensiveBooks();
     }
 
     @Override
